@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="select_arr">
+        <item>百度</item>
+        <item>必应</item>
+        <item>搜狗</item>
+        <item>360</item>
+    </string-array>
+</resources>
