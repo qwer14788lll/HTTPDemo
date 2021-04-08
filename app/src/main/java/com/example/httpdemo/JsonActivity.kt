@@ -3,6 +3,10 @@ package com.example.httpdemo
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.httpdemo.databinding.ActivityJsonBinding
+import com.example.httpdemo.model.App
+import com.example.httpdemo.model.nCoV2019
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONArray
@@ -23,7 +27,12 @@ class JsonActivity : AppCompatActivity() {
             )
         }
 
-        mBinding.buttonJsonGson.setOnClickListener { }
+        mBinding.buttonJsonGson.setOnClickListener {
+            sendHttp(
+                "https://lab.isaaclin.cn/nCoV/api/overall",
+                "GSON"
+            )
+        }
     }
 
     /**
@@ -43,10 +52,7 @@ class JsonActivity : AppCompatActivity() {
                 val response = client.newCall(request).execute()
                 val bodyString = response.body?.string() ?: "目标地址暂无响应，请检查网络连接后重试"
                 runOnUiThread {
-                    mBinding.htmlText.text =
-                        if (jsonParser == "JSONObject") parseJSONObject(bodyString) else parseGSON(
-                            bodyString
-                        )
+                    mBinding.htmlText.text = if (jsonParser == "JSONObject") parseJSONObject(bodyString) else parseGSON(bodyString)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -86,8 +92,27 @@ class JsonActivity : AppCompatActivity() {
     }
 
     private fun parseGSON(data: String): String {
-        TODO("Not yet implemented")
+//        //初始化gson对象
+//        val gson = Gson()
+//        //核准数据类型
+//        val typeOf = object : TypeToken<List<App>>() {}.type
+//        //开始解析
+//        val appList = gson.fromJson<List<App>>(data, typeOf)
+//        val stringBuilder = StringBuilder()
+//        for (app in appList) {
+//            stringBuilder.append("id：").append(app.id).append('\n')
+//            stringBuilder.append("名称：").append(app.name).append('\n')
+//            stringBuilder.append("版本：").append(app.version).append('\n').append('\n')
+//        }
+//        return stringBuilder.toString()
+        val gson = Gson()
+        val list = gson.fromJson(data, nCoV2019::class.java)
+        val overallList = list.results
+        val stringBuilder = StringBuilder()
+        for (overall in overallList){
+            stringBuilder.append("现存确诊人数：").append(overall.currentConfirmedCount).append('\n')
+            stringBuilder.append("累计确诊人数：").append(overall.confirmedCount).append('\n')
+        }
+        return stringBuilder.toString()
     }
-
-
 }
