@@ -1,5 +1,8 @@
 package com.example.httpdemo.util
 
+import okhttp3.FormBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import java.io.BufferedReader
 import java.io.DataOutputStream
 import java.io.InputStreamReader
@@ -11,10 +14,10 @@ object HttpUtil {
     /**
      * 根据指定的网络地址字符串和请求方式，获取服务器返回的数据
      * @param stringUrl 网络地址字符串
-     * @param request 请求方式（枚举类型）
+     * @param method 请求方式（枚举类型）
      * @param listener 网络请求监听器
      */
-    fun sendHttp(stringUrl: String, request: RequestMethod, listener: HttpCallbackListener) {
+    fun sendHttp(stringUrl: String, method: RequestMethod, listener: HttpCallbackListener) {
         thread {
             //提前创建网络连接对象，以便在异常结束时关闭连接
             var connection: HttpURLConnection? = null
@@ -25,7 +28,7 @@ object HttpUtil {
                 connection.connectTimeout = 8000
                 connection.readTimeout = 8000
                 //如果为POST，则打开输出流，将要提交给服务器的数据写入连接
-                if (request == RequestMethod.Post) {
+                if (method == RequestMethod.Post) {
                     connection.requestMethod = "POST"
                     val output = DataOutputStream(connection.outputStream)
                     output.writeBytes("username=admin&password=123456")
@@ -50,5 +53,31 @@ object HttpUtil {
         }
     }
 
-
+    /**
+     * (采用OkHttp框架)根据指定的网络地址字符串和请求方式，获取服务器返回的数据
+     * @param stringUrl 网络地址字符串
+     * @param requestMethod 请求方式
+     */
+    fun sendHttp(stringUrl: String, method: RequestMethod, callback: okhttp3.Callback) {
+        //创建网络连接客户端对象
+        val client = OkHttpClient()
+        val request: Request
+        if (method == RequestMethod.GET) {
+            //构建Request对象
+            request = Request.Builder()
+                .url(stringUrl)
+                .build()
+        } else {
+            //构建需要提交给服务器的参数
+            val requestBody = FormBody.Builder()
+                .add("username", "admin")
+                .add("password", "123456")
+                .build()
+            request = Request.Builder()
+                .post(requestBody)
+                .url(stringUrl)
+                .build()
+        }
+        client.newCall(request).enqueue(callback)
+    }
 }

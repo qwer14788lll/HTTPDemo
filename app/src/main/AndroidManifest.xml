@@ -17,13 +17,15 @@
 
         </activity>
         <activity android:name=".XmlActivity"></activity>
-        <activity android:name=".OkHttpActivity" />
-        <activity android:name=".HttpConnectionActivity" >
+        <activity android:name=".OkHttpActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".HttpConnectionActivity" >
+
         </activity>
         <activity android:name=".MainActivity" />
     </application>
