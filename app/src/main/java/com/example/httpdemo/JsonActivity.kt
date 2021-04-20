@@ -50,7 +50,7 @@ class JsonActivity : AppCompatActivity() {
                     .url(stringUrl)
                     .build()
                 val response = client.newCall(request).execute()
-                val bodyString = response.body?.string() ?: "目标地址暂无响应，请检查网络连接后重试"
+                val bodyString = response.body()?.string() ?: "目标地址暂无响应，请检查网络连接后重试"
                 runOnUiThread {
                     mBinding.htmlText.text = if (jsonParser == "JSONObject") parseJSONObject(bodyString) else parseGSON(bodyString)
                 }

@@ -33,7 +33,7 @@ class OkHttpActivity : AppCompatActivity() {
 
                 override fun onResponse(call: Call, response: Response) {
                     runOnUiThread {
-                        mBinding.htmlText.text = response.body?.string()
+                        mBinding.htmlText.text = response.body()?.string()
                     }
                 }
             })
@@ -51,7 +51,7 @@ class OkHttpActivity : AppCompatActivity() {
 
                 override fun onResponse(call: Call, response: Response) {
                     runOnUiThread {
-                        mBinding.htmlText.text = response.body?.string()
+                        mBinding.htmlText.text = response.body()?.string()
                     }
                 }
             })
