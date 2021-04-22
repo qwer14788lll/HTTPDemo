@@ -5,9 +5,12 @@ import android.os.Bundle
 import android.util.Log
 import com.example.httpdemo.databinding.ActivityRetrofitBinding
 import com.example.httpdemo.model.App
+import com.example.httpdemo.model.User
 import com.example.httpdemo.model.nCoV2019
 import com.example.httpdemo.util.AppService
+import com.example.httpdemo.util.UserService
 import com.example.httpdemo.util.nCoVService
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -70,10 +73,12 @@ class RetrofitActivity : AppCompatActivity() {
                     val ncov = response.body()
                     val list = ncov?.results
                     if (list != null) {
-                        for (overall in list){
-                            stringBuilder.append("现存确诊人数：").append(overall.currentConfirmedCount).append('\n')
-                            stringBuilder.append("累计确诊人数：").append(overall.confirmedCount).append('\n')
-                            mBinding.htmlText.text=stringBuilder.toString()
+                        for (overall in list) {
+                            stringBuilder.append("现存确诊人数：").append(overall.currentConfirmedCount)
+                                .append('\n')
+                            stringBuilder.append("累计确诊人数：").append(overall.confirmedCount)
+                                .append('\n')
+                            mBinding.htmlText.text = stringBuilder.toString()
                         }
                     }
                 }
@@ -82,6 +87,28 @@ class RetrofitActivity : AppCompatActivity() {
                     t.printStackTrace()
                     stringBuilder.append(t)
                     mBinding.htmlText.text = stringBuilder.toString()
+                }
+            })
+        }
+
+        mBinding.buttonPost.setOnClickListener {
+            val retrofit = Retrofit.Builder()
+                .baseUrl("http://10.32.151.137:8080/")
+                .build()
+            val userService = retrofit.create(UserService::class.java)
+            val stringBuilder = StringBuilder()
+            userService.login("admin", "123456").enqueue(object : Callback<ResponseBody> {
+                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                    Log.i("response",response.toString())
+                    val body = response.body()?.string()
+                    Log.i("response",body.toString())
+                    stringBuilder.append(body)
+                    mBinding.htmlText.text = stringBuilder.toString()
+                }
+
+                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                    t.printStackTrace()
+                    mBinding.htmlText.text = t.toString()
                 }
             })
         }
