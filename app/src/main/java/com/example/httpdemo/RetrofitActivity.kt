@@ -1,21 +1,17 @@
 package com.example.httpdemo
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import com.example.httpdemo.databinding.ActivityRetrofitBinding
 import com.example.httpdemo.model.App
-import com.example.httpdemo.model.User
 import com.example.httpdemo.model.nCoV2019
-import com.example.httpdemo.util.AppService
-import com.example.httpdemo.util.UserService
-import com.example.httpdemo.util.nCoVService
+import com.example.httpdemo.util.*
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class RetrofitActivity : AppCompatActivity() {
     private lateinit var mBinding: ActivityRetrofitBinding
@@ -25,15 +21,9 @@ class RetrofitActivity : AppCompatActivity() {
         setContentView(mBinding.root)
 
         mBinding.buttonGet.setOnClickListener {
-            //构建Retrofit对象
-            val retrofit = Retrofit.Builder()
-                //设定根地址
-                .baseUrl("http://10.32.151.137:8080/")
-                //设定json转换器
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-            //根据指定的接口创建功能服务(相当于将接口实现，然后给我们实现类的对象)
-            val appService = retrofit.create(AppService::class.java)
+            //startActivity<MainActivity>(applicationContext)
+            //val appService = ServiceCreator.create(AppService::class.java)
+            val appService = ServiceCreator.create<AppService>()
             val stringBuilder = StringBuilder()
             //调用接口方法，发送相应的网络请求
             appService.getAppData().enqueue(object : Callback<List<App>> {
@@ -62,11 +52,12 @@ class RetrofitActivity : AppCompatActivity() {
         }
 
         mBinding.buttonNcov.setOnClickListener {
-            val retrofit = Retrofit.Builder()
-                .baseUrl("https://lab.isaaclin.cn/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-            val nCoVService = retrofit.create(nCoVService::class.java)
+//            val retrofit = Retrofit.Builder()
+//                .baseUrl("https://lab.isaaclin.cn/")
+//                .addConverterFactory(GsonConverterFactory.create())
+//                .build()
+//            val nCoVService = retrofit.create(nCoVService::class.java)
+            val nCoVService = ServiceCreator.create(nCoVService::class.java)
             val stringBuilder = StringBuilder()
             nCoVService.getData().enqueue(object : Callback<nCoV2019> {
                 override fun onResponse(call: Call<nCoV2019>, response: Response<nCoV2019>) {
@@ -98,10 +89,13 @@ class RetrofitActivity : AppCompatActivity() {
             val userService = retrofit.create(UserService::class.java)
             val stringBuilder = StringBuilder()
             userService.login("admin", "123456").enqueue(object : Callback<ResponseBody> {
-                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                    Log.i("response",response.toString())
+                override fun onResponse(
+                    call: Call<ResponseBody>,
+                    response: Response<ResponseBody>
+                ) {
+                    Log.i("response", response.toString())
                     val body = response.body()?.string()
-                    Log.i("response",body.toString())
+                    Log.i("response", body.toString())
                     stringBuilder.append(body)
                     mBinding.htmlText.text = stringBuilder.toString()
                 }
